@@ -1,0 +1,7 @@
+aru:
+  address: routing.collection.build.Routes
+  file: src/RouteCollection.php
+  layer: L2_MOLECULE
+  description: Mutable collection of routes with convenience methods for common HTTP methods.
+  composition_patterns:
+    - VALIDATE

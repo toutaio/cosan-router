@@ -1,0 +1,5 @@
+aru:
+  address: routing.RoutePattern
+  file: src/RoutePattern.php
+  layer: L0_PRIMITIVE
+  description: Branded type wrapping a route URI pattern string (e.g., "/users/{id}").

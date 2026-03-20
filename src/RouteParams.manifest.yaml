@@ -1,0 +1,5 @@
+aru:
+  address: routing.RouteParams
+  file: src/RouteParams.php
+  layer: L0_PRIMITIVE
+  description: Branded type wrapping matched route parameters as an associative array.

@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 use Touta\Aria\Runtime\Failure;
 use Touta\Aria\Runtime\Success;
-use Touta\Cosan\Route;
 use Touta\Cosan\RouteCollection;
+use Touta\Cosan\RouteParams;
+use Touta\Cosan\RoutePattern;
 use Touta\Cosan\Router;
+use Touta\Cosan\RoutingError;
 
+// Scenario: matching an exact static route returns Success with RouteMatch
 it('matches an exact static route', function (): void {
     $collection = new RouteCollection();
     $collection->get('/users', fn(): string => 'list users');
@@ -18,10 +21,11 @@ it('matches an exact static route', function (): void {
     expect($result)->toBeInstanceOf(Success::class);
 
     $match = $result->value();
-    expect($match->route->path)->toBe('/users')
-        ->and($match->params)->toBe([]);
+    expect($match->route->pattern)->toEqual(new RoutePattern('/users'))
+        ->and($match->params)->toEqual(new RouteParams());
 });
 
+// Scenario: matching a route with a parameter extracts RouteParams
 it('matches a route with a parameter', function (): void {
     $collection = new RouteCollection();
     $collection->get('/users/{id}', fn(): string => 'show user');
@@ -32,10 +36,11 @@ it('matches a route with a parameter', function (): void {
     expect($result)->toBeInstanceOf(Success::class);
 
     $match = $result->value();
-    expect($match->params)->toBe(['id' => '42']);
+    expect($match->params)->toEqual(new RouteParams(['id' => '42']));
 });
 
-it('returns failure for unmatched path', function (): void {
+// Scenario: unmatched path returns Failure with RoutingError NOT_FOUND
+it('returns failure with RoutingError for unmatched path', function (): void {
     $collection = new RouteCollection();
     $collection->get('/users', fn(): string => 'list');
 
@@ -43,9 +48,14 @@ it('returns failure for unmatched path', function (): void {
     $result = $router->match('GET', '/posts');
 
     expect($result)->toBeInstanceOf(Failure::class);
+
+    $error = $result->error();
+    expect($error)->toBeInstanceOf(RoutingError::class)
+        ->and($error->code)->toBe(RoutingError::NOT_FOUND);
 });
 
-it('returns failure for unmatched method', function (): void {
+// Scenario: unmatched method returns Failure with RoutingError NOT_FOUND
+it('returns failure with RoutingError for unmatched method', function (): void {
     $collection = new RouteCollection();
     $collection->get('/users', fn(): string => 'list');
 
@@ -53,8 +63,13 @@ it('returns failure for unmatched method', function (): void {
     $result = $router->match('POST', '/users');
 
     expect($result)->toBeInstanceOf(Failure::class);
+
+    $error = $result->error();
+    expect($error)->toBeInstanceOf(RoutingError::class)
+        ->and($error->code)->toBe(RoutingError::NOT_FOUND);
 });
 
+// Scenario: first matching route wins when multiple routes match
 it('matches the first matching route', function (): void {
     $collection = new RouteCollection();
     $collection->get('/users', fn(): string => 'first');

@@ -1,0 +1,8 @@
+aru:
+  address: routing.match.execute.Router
+  file: src/Router.php
+  layer: L3_ORGANISM
+  description: Matches incoming HTTP method and URI against registered routes, returning a RouteMatch or RoutingError.
+  composition_patterns:
+    - ROUTE
+    - VALIDATE

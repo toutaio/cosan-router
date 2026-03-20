@@ -1,0 +1,10 @@
+aru:
+  address: routing.RoutingError
+  file: src/RoutingError.php
+  layer: L0_PRIMITIVE
+  description: Domain-typed error for routing failures with structured codes and context.
+  error_codes:
+    - ROUTING.NOT_FOUND
+    - ROUTING.METHOD_NOT_ALLOWED
+    - ROUTING.INVALID_PATTERN
+    - ROUTING.MIDDLEWARE_FAILED

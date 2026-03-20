@@ -6,7 +6,6 @@ namespace Touta\Cosan;
 
 use Touta\Aria\Runtime\Failure;
 use Touta\Aria\Runtime\Result;
-use Touta\Aria\Runtime\StructuredFailure;
 use Touta\Aria\Runtime\Success;
 
 final readonly class Router
@@ -16,7 +15,7 @@ final readonly class Router
     ) {}
 
     /**
-     * @return Success<RouteMatch>|Failure<StructuredFailure>
+     * @return Success<RouteMatch>|Failure<RoutingError>
      */
     public function match(string $method, string $uri): Result
     {
@@ -25,26 +24,23 @@ final readonly class Router
                 continue;
             }
 
-            $params = $this->matchPath($route->path, $uri);
+            $params = $this->matchPattern($route->pattern, $uri);
 
             if ($params !== null) {
                 return Success::of(new RouteMatch($route, $params));
             }
         }
 
-        return Failure::from(new StructuredFailure(
-            'ROUTE_NOT_FOUND',
+        return Failure::from(new RoutingError(
+            RoutingError::NOT_FOUND,
             "No route matched {$method} {$uri}",
             ['method' => $method, 'uri' => $uri],
         ));
     }
 
-    /**
-     * @return array<string, string>|null
-     */
-    private function matchPath(string $pattern, string $uri): ?array
+    private function matchPattern(RoutePattern $pattern, string $uri): ?RouteParams
     {
-        $regex = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $pattern);
+        $regex = preg_replace('/\{([a-zA-Z_]+)\}/', '(?P<$1>[^/]+)', $pattern->value);
         $regex = '#^' . $regex . '$#';
 
         if (preg_match($regex, $uri, $matches) !== 1) {
@@ -60,6 +56,6 @@ final readonly class Router
             }
         }
 
-        return $params;
+        return new RouteParams($params);
     }
 }

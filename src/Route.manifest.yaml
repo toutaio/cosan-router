@@ -1,0 +1,8 @@
+aru:
+  address: routing.Route
+  file: src/Route.php
+  layer: L0_PRIMITIVE
+  description: Immutable route definition with branded pattern and name types.
+  branded_types:
+    - RoutePattern
+    - RouteName

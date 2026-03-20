@@ -8,6 +8,7 @@ use Touta\Aria\Runtime\Result;
 use Touta\Aria\Runtime\Success;
 use Touta\Cosan\MiddlewarePipeline;
 
+// Scenario: handler executes directly when no middleware registered
 it('executes handler when no middleware is registered', function (): void {
     $pipeline = new MiddlewarePipeline();
 
@@ -20,6 +21,7 @@ it('executes handler when no middleware is registered', function (): void {
         ->and($result->value()->body())->toBe('ok');
 });
 
+// Scenario: single middleware wraps the handler response
 it('passes request through a single middleware', function (): void {
     $pipeline = new MiddlewarePipeline();
     $pipeline->add(function (RequestInterface $request, callable $next): Result {
@@ -40,6 +42,7 @@ it('passes request through a single middleware', function (): void {
     expect($result->value()->body())->toBe('base +middleware');
 });
 
+// Scenario: middleware executes in order — first added is outermost
 it('executes middleware in order (first added = outermost)', function (): void {
     $pipeline = new MiddlewarePipeline();
 

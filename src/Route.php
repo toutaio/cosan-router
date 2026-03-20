@@ -11,8 +11,8 @@ final readonly class Route
      */
     public function __construct(
         public string $method,
-        public string $path,
+        public RoutePattern $pattern,
         public mixed $handler,
-        public ?string $name = null,
+        public ?RouteName $name = null,
     ) {}
 }

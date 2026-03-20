@@ -1,0 +1,7 @@
+aru:
+  address: routing.middleware.execute.Pipeline
+  file: src/MiddlewarePipeline.php
+  layer: L3_ORGANISM
+  description: Executes a chain of middleware around a final handler using function composition.
+  composition_patterns:
+    - PIPE

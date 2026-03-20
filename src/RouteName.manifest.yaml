@@ -1,0 +1,5 @@
+aru:
+  address: routing.RouteName
+  file: src/RouteName.php
+  layer: L0_PRIMITIVE
+  description: Branded type wrapping a route name string.

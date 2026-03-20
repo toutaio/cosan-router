@@ -1,0 +1,7 @@
+aru:
+  address: routing.RouteMatch
+  file: src/RouteMatch.php
+  layer: L0_PRIMITIVE
+  description: Result of a successful route match, containing the matched route and extracted parameters.
+  branded_types:
+    - RouteParams

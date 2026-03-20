@@ -16,12 +16,12 @@ final class RouteCollection
 
     public function get(string $path, callable $handler, ?string $name = null): void
     {
-        $this->add(new Route('GET', $path, $handler, $name));
+        $this->add(new Route('GET', new RoutePattern($path), $handler, $name !== null ? new RouteName($name) : null));
     }
 
     public function post(string $path, callable $handler, ?string $name = null): void
     {
-        $this->add(new Route('POST', $path, $handler, $name));
+        $this->add(new Route('POST', new RoutePattern($path), $handler, $name !== null ? new RouteName($name) : null));
     }
 
     /**

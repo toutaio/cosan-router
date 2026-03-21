@@ -6,6 +6,11 @@ use Touta\Aria\Runtime\Http\RequestInterface;
 use Touta\Aria\Runtime\Http\ResponseInterface;
 use Touta\Aria\Runtime\Result;
 use Touta\Aria\Runtime\Success;
+use Touta\Aria\Runtime\Type\HeaderMap;
+use Touta\Aria\Runtime\Type\HttpBody;
+use Touta\Aria\Runtime\Type\HttpMethod;
+use Touta\Aria\Runtime\Type\StatusCode;
+use Touta\Aria\Runtime\Type\UriPath;
 use Touta\Cosan\MiddlewarePipeline;
 
 // Scenario: handler executes directly when no middleware registered
@@ -18,7 +23,7 @@ it('executes handler when no middleware is registered', function (): void {
     $result = $pipeline->handle($request, $handler);
 
     expect($result)->toBeInstanceOf(Success::class)
-        ->and($result->value()->body())->toBe('ok');
+        ->and($result->value()->body()->value)->toBe('ok');
 });
 
 // Scenario: single middleware wraps the handler response
@@ -29,8 +34,8 @@ it('passes request through a single middleware', function (): void {
         $response = $result->value();
 
         return Success::of(createStubResponse(
-            $response->statusCode(),
-            $response->body() . ' +middleware',
+            $response->statusCode()->value,
+            $response->body()->value . ' +middleware',
         ));
     });
 
@@ -39,7 +44,7 @@ it('passes request through a single middleware', function (): void {
 
     $result = $pipeline->handle($request, $handler);
 
-    expect($result->value()->body())->toBe('base +middleware');
+    expect($result->value()->body()->value)->toBe('base +middleware');
 });
 
 // Scenario: middleware executes in order — first added is outermost
@@ -49,13 +54,13 @@ it('executes middleware in order (first added = outermost)', function (): void {
     $pipeline->add(function (RequestInterface $request, callable $next): Result {
         $result = $next($request);
 
-        return Success::of(createStubResponse(200, $result->value()->body() . ' +A'));
+        return Success::of(createStubResponse(200, $result->value()->body()->value . ' +A'));
     });
 
     $pipeline->add(function (RequestInterface $request, callable $next): Result {
         $result = $next($request);
 
-        return Success::of(createStubResponse(200, $result->value()->body() . ' +B'));
+        return Success::of(createStubResponse(200, $result->value()->body()->value . ' +B'));
     });
 
     $request = createStubRequest('GET', '/');
@@ -63,7 +68,7 @@ it('executes middleware in order (first added = outermost)', function (): void {
 
     $result = $pipeline->handle($request, $handler);
 
-    expect($result->value()->body())->toBe('core +B +A');
+    expect($result->value()->body()->value)->toBe('core +B +A');
 });
 
 // Test helpers
@@ -75,25 +80,24 @@ function createStubRequest(string $method, string $uri): RequestInterface
             private readonly string $uri,
         ) {}
 
-        public function method(): string
+        public function method(): HttpMethod
         {
-            return $this->method;
+            return HttpMethod::from($this->method);
         }
 
-        public function uri(): string
+        public function uri(): UriPath
         {
-            return $this->uri;
+            return UriPath::from($this->uri);
         }
 
-        /** @return array<string, list<string>> */
-        public function headers(): array
+        public function headers(): HeaderMap
         {
-            return [];
+            return HeaderMap::from([]);
         }
 
-        public function body(): string
+        public function body(): HttpBody
         {
-            return '';
+            return HttpBody::from('');
         }
     };
 }
@@ -106,20 +110,19 @@ function createStubResponse(int $status, string $body): ResponseInterface
             private readonly string $body,
         ) {}
 
-        public function statusCode(): int
+        public function statusCode(): StatusCode
         {
-            return $this->status;
+            return StatusCode::from($this->status);
         }
 
-        /** @return array<string, list<string>> */
-        public function headers(): array
+        public function headers(): HeaderMap
         {
-            return [];
+            return HeaderMap::from([]);
         }
 
-        public function body(): string
+        public function body(): HttpBody
         {
-            return $this->body;
+            return HttpBody::from($this->body);
         }
     };
 }
